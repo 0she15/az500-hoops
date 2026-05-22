@@ -45,7 +45,8 @@ const DEFAULT_PLAYER = () => ({
   domainMastery: { NET: 0, IDN: 0, CMP: 0, DFC: 0, STR: 0 },
   dailyStreak: 0, lastPlayDate: null, questionsToday: 0,
   badges: [],
-  usedQuestions: []
+  usedQuestions: [],
+  bestStreak: 0, totalAnswered: 0, totalCorrect: 0
 });
 
 let playerState = DEFAULT_PLAYER();
@@ -93,7 +94,12 @@ function loadPlayer() {
     const raw = localStorage.getItem('az500_player');
     if (raw) {
       const saved = JSON.parse(raw);
-      if (saved.version === 1) playerState = saved;
+      if (saved.version === 1) {
+        playerState = saved;
+        playerState.bestStreak    = playerState.bestStreak    ?? 0;
+        playerState.totalAnswered = playerState.totalAnswered ?? 0;
+        playerState.totalCorrect  = playerState.totalCorrect  ?? 0;
+      }
     }
   } catch(e) {}
 }
@@ -524,9 +530,12 @@ function submitAnswer(correct, q) {
   // Track used
   if (!playerState.usedQuestions.includes(q.id)) playerState.usedQuestions.push(q.id);
   if (playerState.usedQuestions.length >= QUESTION_BANK.length) playerState.usedQuestions = [];
+  playerState.totalAnswered++;
+  if (correct) playerState.totalCorrect++;
 
   if (correct) {
     gameState.streak++;
+    if (gameState.streak > playerState.bestStreak) playerState.bestStreak = gameState.streak;
     gameState.multiplier = gameState.streak >= 7 ? 4 : gameState.streak >= 5 ? 3 : gameState.streak >= 3 ? 2 : 1;
     gameState.sessionCorrect++;
     gameState.domainStreak = (gameState.domain === null || q.domain === gameState.domain) ? gameState.domainStreak + 1 : 0;
@@ -839,6 +848,76 @@ function loadNextQuestion() {
   updateHUD();
 }
 
+// ═══ SECTION: PLAYER PROFILE ═══
+
+const DOMAIN_FULL = { NET: 'Networking', IDN: 'Identity', CMP: 'Compute', DFC: 'Defender', STR: 'Storage' };
+
+function openProfile() {
+  const ri = getRankInfo(playerState.rating);
+
+  document.getElementById('profile-rank-badge').textContent  = ri.rank.toUpperCase();
+  document.getElementById('profile-rating').textContent      = playerState.rating;
+  document.getElementById('profile-level').textContent       = playerState.level;
+  document.getElementById('profile-xp').textContent          = playerState.xp.toLocaleString();
+  document.getElementById('profile-streak').textContent      = gameState.streak || 0;
+  document.getElementById('profile-best-streak').textContent = playerState.bestStreak;
+  document.getElementById('profile-answered').textContent    = playerState.totalAnswered;
+
+  const acc = playerState.totalAnswered > 0
+    ? Math.round((playerState.totalCorrect / playerState.totalAnswered) * 100) + '%'
+    : '—';
+  document.getElementById('profile-accuracy').textContent = acc;
+
+  const hs = playerState.highScores;
+  const modeBest = [
+    { name: 'BLITZ',   score: hs.blitz },
+    { name: 'S.DEATH', score: hs.suddenDeath },
+    { name: 'BOSS',    score: hs.bossBattle }
+  ].reduce((a, b) => a.score >= b.score ? a : b);
+  document.getElementById('profile-best-mode').textContent = modeBest.score > 0 ? modeBest.name : '—';
+
+  const domsEl = document.getElementById('profile-domains');
+  domsEl.innerHTML = '';
+  ['NET','IDN','CMP','DFC','STR'].forEach(d => {
+    const color   = DOMAIN_COLORS[d];
+    const stat    = Math.floor(playerState.stats[d]);
+    const mastery = Math.round(playerState.domainMastery[d]);
+    const row = document.createElement('div');
+    row.className = 'profile-domain-row';
+    row.innerHTML = `
+      <span class="pdr-code" style="color:${color}">${d}</span>
+      <span class="pdr-stat">${stat}</span>
+      <div class="pdr-track"><div class="pdr-fill" style="width:${mastery}%;background:${color}"></div></div>
+      <span class="pdr-pct" style="color:${color}">${mastery}%</span>`;
+    domsEl.appendChild(row);
+  });
+
+  const badgesEl = document.getElementById('profile-badges');
+  const badgesLabel = document.getElementById('profile-badges-label');
+  badgesLabel.style.display = playerState.badges.length ? '' : 'none';
+  badgesEl.innerHTML = '';
+  playerState.badges.forEach(id => {
+    const chip = document.createElement('div');
+    chip.className = 'profile-badge-chip';
+    chip.textContent = BADGE_DEFS[id] ? BADGE_DEFS[id].label : id;
+    badgesEl.appendChild(chip);
+  });
+
+  const panel = document.getElementById('profile-panel');
+  panel.classList.remove('closing');
+  panel.scrollTop = 0;
+  document.getElementById('overlay-profile').classList.remove('hidden');
+}
+
+function closeProfile() {
+  const panel = document.getElementById('profile-panel');
+  panel.classList.add('closing');
+  panel.addEventListener('animationend', () => {
+    document.getElementById('overlay-profile').classList.add('hidden');
+    panel.classList.remove('closing');
+  }, { once: true });
+}
+
 // ═══ SECTION: EVENT LISTENERS & INIT ═══
 
 function initApp() {
@@ -901,6 +980,13 @@ function initApp() {
 
   // Reset
   document.getElementById('reset-btn').addEventListener('click', resetPlayer);
+
+  // Player profile
+  document.getElementById('profile-trigger').addEventListener('click', openProfile);
+  document.getElementById('profile-close').addEventListener('click', closeProfile);
+  document.getElementById('overlay-profile').addEventListener('click', e => {
+    if (e.target === document.getElementById('overlay-profile')) closeProfile();
+  });
 
   renderHomeScreen();
 }

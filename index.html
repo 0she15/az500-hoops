@@ -14,7 +14,7 @@
 <div id="screen-home" class="screen active">
   <div class="home-header">
     <div class="game-title">AZ-500<span>HOOPS</span></div>
-    <div class="daily-streak-badge" id="daily-streak-badge">🔥 <span id="daily-streak-num">0</span></div>
+    <button class="daily-streak-badge" id="profile-trigger">🔥 <span id="daily-streak-num">0</span></button>
   </div>
 
   <div id="player-card" class="player-card">
@@ -209,6 +209,55 @@
 </div>
 
 <div id="badge-toast" class="badge-toast hidden"></div>
+
+<!-- ═══ PLAYER PROFILE OVERLAY ═══ -->
+<div id="overlay-profile" class="overlay overlay-profile hidden">
+  <div id="profile-panel" class="profile-panel">
+    <div class="profile-header">
+      <div class="profile-title-block">
+        <div class="profile-rank-badge" id="profile-rank-badge">ROOKIE</div>
+        <div class="profile-hero-row">
+          <span class="profile-rating" id="profile-rating">55</span>
+          <span class="profile-level-tag">LVL <span id="profile-level">1</span></span>
+        </div>
+      </div>
+      <button class="profile-close" id="profile-close">✕</button>
+    </div>
+
+    <div class="profile-stats-grid">
+      <div class="profile-stat-item">
+        <div class="psi-value" id="profile-xp">0</div>
+        <div class="psi-label">TOTAL XP</div>
+      </div>
+      <div class="profile-stat-item">
+        <div class="psi-value" id="profile-streak">0</div>
+        <div class="psi-label">CURR STREAK</div>
+      </div>
+      <div class="profile-stat-item">
+        <div class="psi-value" id="profile-best-streak">0</div>
+        <div class="psi-label">BEST STREAK</div>
+      </div>
+      <div class="profile-stat-item">
+        <div class="psi-value" id="profile-accuracy">—</div>
+        <div class="psi-label">ACCURACY</div>
+      </div>
+      <div class="profile-stat-item">
+        <div class="psi-value" id="profile-answered">0</div>
+        <div class="psi-label">ANSWERED</div>
+      </div>
+      <div class="profile-stat-item">
+        <div class="psi-value" id="profile-best-mode">—</div>
+        <div class="psi-label">BEST MODE</div>
+      </div>
+    </div>
+
+    <div class="profile-section-label">DOMAIN RATINGS</div>
+    <div id="profile-domains" class="profile-domains"></div>
+
+    <div class="profile-section-label" id="profile-badges-label">BADGES</div>
+    <div id="profile-badges" class="profile-badges"></div>
+  </div>
+</div>
 
 <script src="questions.js"></script>
 <script src="app.js"></script>
