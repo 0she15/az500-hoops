@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2D5016">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Level Up">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="manifest" href="manifest.json">
+  <title>Level Up Apartment Plan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <!-- Prevent dark mode flash — must run before CSS paint -->
+  <script>
+    (function() {
+      try {
+        var s = JSON.parse(localStorage.getItem('lup_settings') || '{}');
+        if (s.darkMode) document.documentElement.setAttribute('data-theme', 'dark');
+      } catch(e) {}
+    })();
+  </script>
+</head>
+<body>
+
+<main id="app">
+
+  <!-- ═══════════════════════════════════════════
+       DASHBOARD
+  ═══════════════════════════════════════════ -->
+  <section id="sec-dashboard" class="section active" aria-label="Dashboard">
+    <div class="section-scroll">
+      <div class="hero">
+        <div class="hero-badge">Personal Finance</div>
+        <h1 class="hero-title">Level Up<br>Apartment Plan</h1>
+        <p class="hero-subtitle">The second paycheck builds the future.</p>
+      </div>
+
+      <div class="metric-pills">
+        <div class="metric-pill">
+          <span class="metric-value" id="dash-total-saved">$0</span>
+          <span class="metric-label">Total Saved</span>
+        </div>
+        <div class="metric-pill">
+          <span class="metric-value" id="dash-remaining">$7,800</span>
+          <span class="metric-label">Remaining</span>
+        </div>
+        <div class="metric-pill">
+          <span class="metric-value" id="dash-percent">0%</span>
+          <span class="metric-label">Complete</span>
+        </div>
+      </div>
+
+      <div class="overall-progress-wrap">
+        <div class="overall-progress-bar">
+          <div class="overall-progress-fill" id="dash-overall-fill" style="width:0%"></div>
+        </div>
+        <div class="overall-progress-labels">
+          <span>$0</span>
+          <span>$7,800 goal</span>
+        </div>
+      </div>
+
+      <div class="goal-cards">
+        <div class="goal-card" id="goal-nov">
+          <div class="goal-card-header">
+            <div>
+              <div class="goal-card-label">November Fund</div>
+              <div class="goal-card-date">Due: November 2025</div>
+            </div>
+            <div class="goal-card-icon">🏠</div>
+          </div>
+          <div class="goal-stats">
+            <div class="goal-stat">
+              <span class="goal-stat-val" id="nov-saved">$0</span>
+              <span class="goal-stat-lbl">Saved</span>
+            </div>
+            <div class="goal-stat">
+              <span class="goal-stat-val" id="nov-remaining">$4,700</span>
+              <span class="goal-stat-lbl">Remaining</span>
+            </div>
+            <div class="goal-stat">
+              <span class="goal-stat-val" id="nov-pct">0%</span>
+              <span class="goal-stat-lbl">Done</span>
+            </div>
+          </div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar">
+              <div class="progress-fill green" id="nov-fill" style="width:0%"></div>
+            </div>
+          </div>
+          <div class="goal-input-row">
+            <label class="sr-only" for="nov-input">November fund amount</label>
+            <input type="number" id="nov-input" class="goal-input" placeholder="Enter saved amount" min="0" max="4700">
+            <button class="btn-update" data-action="update-savings" data-id="novFund">Update</button>
+          </div>
+        </div>
+
+        <div class="goal-card" id="goal-living">
+          <div class="goal-card-header">
+            <div>
+              <div class="goal-card-label">Living Room Fund</div>
+              <div class="goal-card-date">Ongoing</div>
+            </div>
+            <div class="goal-card-icon">🛋️</div>
+          </div>
+          <div class="goal-stats">
+            <div class="goal-stat">
+              <span class="goal-stat-val" id="lr-saved">$0</span>
+              <span class="goal-stat-lbl">Saved</span>
+            </div>
+            <div class="goal-stat">
+              <span class="goal-stat-val" id="lr-remaining">$3,100</span>
+              <span class="goal-stat-lbl">Remaining</span>
+            </div>
+            <div class="goal-stat">
+              <span class="goal-stat-val" id="lr-pct">0%</span>
+              <span class="goal-stat-lbl">Done</span>
+            </div>
+          </div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar">
+              <div class="progress-fill maroon" id="lr-fill" style="width:0%"></div>
+            </div>
+          </div>
+          <div class="goal-input-row">
+            <label class="sr-only" for="lr-input">Living room fund amount</label>
+            <input type="number" id="lr-input" class="goal-input" placeholder="Enter saved amount" min="0" max="3100">
+            <button class="btn-update" data-action="update-savings" data-id="livingRoomFund">Update</button>
+          </div>
+        </div>
+
+        <div class="goal-card goal-card--total" id="goal-total">
+          <div class="goal-card-header">
+            <div>
+              <div class="goal-card-label">Total Goal</div>
+              <div class="goal-card-date">Combined</div>
+            </div>
+            <div class="goal-card-icon">✨</div>
+          </div>
+          <div class="goal-stats">
+            <div class="goal-stat">
+              <span class="goal-stat-val" id="total-saved">$0</span>
+              <span class="goal-stat-lbl">Saved</span>
+            </div>
+            <div class="goal-stat">
+              <span class="goal-stat-val" id="total-remaining">$7,800</span>
+              <span class="goal-stat-lbl">Remaining</span>
+            </div>
+            <div class="goal-stat">
+              <span class="goal-stat-val" id="total-pct">0%</span>
+              <span class="goal-stat-lbl">Done</span>
+            </div>
+          </div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar">
+              <div class="progress-fill brown" id="total-fill" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       PAYCHECKS
+  ═══════════════════════════════════════════ -->
+  <section id="sec-paychecks" class="section" aria-label="Paychecks">
+    <div class="section-scroll">
+      <div class="section-header">
+        <h2 class="section-title">Paycheck Planner</h2>
+        <p class="section-subtitle">$3,000 biweekly · Two checks, two purposes</p>
+      </div>
+
+      <div class="paycheck-card" id="check1-card">
+        <div class="paycheck-header">
+          <div class="paycheck-label">
+            <div class="paycheck-badge stability">Stability</div>
+            <h3>Check 1 — Stability Check</h3>
+          </div>
+          <div class="paycheck-income">$3,000</div>
+        </div>
+        <div class="paycheck-rows" id="check1-rows"></div>
+        <div class="paycheck-remainder-row">
+          <span class="remainder-label">Remaining after essentials</span>
+          <span class="remainder-value" id="check1-remainder">$0</span>
+        </div>
+        <div class="paycheck-bar-wrap">
+          <div class="paycheck-bar" id="check1-bar"></div>
+        </div>
+        <button class="btn-log-paycheck" data-action="log-paycheck" data-check="1">
+          Log Paycheck Received
+        </button>
+      </div>
+
+      <div class="paycheck-card" id="check2-card">
+        <div class="paycheck-header">
+          <div class="paycheck-label">
+            <div class="paycheck-badge growth">Growth</div>
+            <h3>Check 2 — Growth Check</h3>
+          </div>
+          <div class="paycheck-income">$3,000</div>
+        </div>
+        <div class="paycheck-rows" id="check2-rows"></div>
+        <div class="paycheck-remainder-row" id="check2-remainder-row">
+          <span class="remainder-label">Free Spending (remainder)</span>
+          <span class="remainder-value" id="check2-remainder">$0</span>
+        </div>
+        <div class="paycheck-bar-wrap">
+          <div class="paycheck-bar" id="check2-bar"></div>
+        </div>
+        <button class="btn-log-paycheck" data-action="log-paycheck" data-check="2">
+          Log Paycheck Received
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       PURCHASES
+  ═══════════════════════════════════════════ -->
+  <section id="sec-purchases" class="section" aria-label="Purchase Tracker">
+    <div class="section-scroll">
+      <div class="section-header">
+        <h2 class="section-title">Purchase Tracker</h2>
+        <p class="section-subtitle">One item at a time, no financing</p>
+      </div>
+
+      <div class="filter-bar">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="wishlist">Wishlist</button>
+        <button class="filter-btn" data-filter="saving">Saving</button>
+        <button class="filter-btn" data-filter="purchased">Purchased</button>
+        <button class="filter-btn" data-filter="delivered">Delivered</button>
+      </div>
+
+      <div class="sort-row">
+        <label class="sort-label" for="purchases-sort">Sort by:</label>
+        <select class="sort-select" id="purchases-sort">
+          <option value="priority">Priority</option>
+          <option value="month">Target Month</option>
+          <option value="cost">Cost</option>
+        </select>
+      </div>
+
+      <div class="purchases-list" id="purchases-list"></div>
+
+      <button class="fab" id="add-purchase-fab" aria-label="Add purchase item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       VISION BOARD
+  ═══════════════════════════════════════════ -->
+  <section id="sec-vision" class="section" aria-label="Vision Board">
+    <div class="section-scroll">
+      <div class="section-header">
+        <h2 class="section-title">Vision Board</h2>
+        <p class="section-subtitle">See it before you build it</p>
+      </div>
+
+      <div class="storage-indicator" id="vision-storage"></div>
+
+      <div class="vision-tabs" id="vision-tabs">
+        <button class="vision-tab active" data-cat="coffee-table">Coffee Table</button>
+        <button class="vision-tab" data-cat="rug">Rug</button>
+        <button class="vision-tab" data-cat="lighting">Lighting</button>
+        <button class="vision-tab" data-cat="tv-wall">TV Wall</button>
+        <button class="vision-tab" data-cat="gallery">Gallery</button>
+        <button class="vision-tab" data-cat="decor">Decor</button>
+      </div>
+
+      <div class="vision-add-row">
+        <button class="btn-add-photo" id="add-photo-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21 15 16 10 5 21"/>
+          </svg>
+          Add Photo
+        </button>
+        <input type="text" class="vision-url-input" id="vision-url-input" placeholder="Or paste image URL…">
+        <button class="btn-add-url" id="add-url-btn">Add</button>
+        <input type="file" id="vision-file-input" accept="image/*" style="display:none">
+      </div>
+
+      <div class="vision-grid" id="vision-grid"></div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       WEEKLY RESET
+  ═══════════════════════════════════════════ -->
+  <section id="sec-weekly" class="section" aria-label="Weekly Reset">
+    <div class="section-scroll">
+      <div class="section-header">
+        <h2 class="section-title">Weekly Reset</h2>
+        <p class="section-subtitle">Consistency builds the life you want</p>
+      </div>
+
+      <div class="streak-card">
+        <div class="streak-number" id="weekly-streak">0</div>
+        <div class="streak-label">Week Streak</div>
+        <div class="streak-sub">Keep your momentum going</div>
+      </div>
+
+      <div class="weekly-tasks" id="weekly-tasks"></div>
+
+      <div class="weekly-actions">
+        <button class="btn-mark-all" data-action="mark-all-weekly">Mark All Complete</button>
+        <button class="btn-reset-week" data-action="reset-week">Reset Week</button>
+      </div>
+
+      <div class="confetti-wrap" id="confetti-wrap" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       TIMELINE
+  ═══════════════════════════════════════════ -->
+  <section id="sec-timeline" class="section" aria-label="Milestone Timeline">
+    <div class="section-scroll">
+      <div class="section-header">
+        <h2 class="section-title">Milestone Timeline</h2>
+        <p class="section-subtitle">Your path to the perfect space</p>
+      </div>
+
+      <div class="timeline" id="timeline-list"></div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       RULES
+  ═══════════════════════════════════════════ -->
+  <section id="sec-rules" class="section" aria-label="No Broke Luxury Rules">
+    <div class="section-scroll">
+      <div class="section-header">
+        <h2 class="section-title">No Broke Luxury Rules</h2>
+        <p class="section-subtitle">The principles that protect the plan</p>
+      </div>
+
+      <div class="rules-list">
+        <div class="rule-card">
+          <div class="rule-number" aria-hidden="true">01</div>
+          <div class="rule-content">
+            <h3 class="rule-title">No Financing Furniture</h3>
+            <p class="rule-body">If you can't pay cash, you can't have it yet. Debt on depreciating assets destroys momentum. Save first, buy second — always.</p>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-number" aria-hidden="true">02</div>
+          <div class="rule-content">
+            <h3 class="rule-title">One Major Purchase at a Time</h3>
+            <p class="rule-body">Focus spending power. Trying to buy the rug, lamp, and coffee table simultaneously spreads resources thin and delays all three.</p>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-number" aria-hidden="true">03</div>
+          <div class="rule-content">
+            <h3 class="rule-title">November Goal Always Comes First</h3>
+            <p class="rule-body">The $4,700 November fund is non-negotiable. Every other purchase decision filters through this priority. Period.</p>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-number" aria-hidden="true">04</div>
+          <div class="rule-content">
+            <h3 class="rule-title">72-Hour Rule on $150+ Purchases</h3>
+            <p class="rule-body">Wait three full days before buying anything over $150. Most impulse purchases feel less urgent after 72 hours of reflection.</p>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-number" aria-hidden="true">05</div>
+          <div class="rule-content">
+            <h3 class="rule-title">Rug &amp; Lighting Before Decor</h3>
+            <p class="rule-body">Foundation pieces transform a room. A beautiful rug and thoughtful lighting do more than a dozen accent pieces. Invest in the fundamentals first.</p>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-number" aria-hidden="true">06</div>
+          <div class="rule-content">
+            <h3 class="rule-title">Maintain Emergency Buffer</h3>
+            <p class="rule-body">Never drop below a minimum emergency reserve. The apartment plan only works if life's surprises don't derail it. The buffer is sacred.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="quotes-carousel" id="quotes-carousel">
+        <div class="quote-slide active" id="quote-text">
+          <blockquote class="quote-text">"Wealth is not about having a lot of money. It's about having a lot of options."</blockquote>
+          <cite class="quote-author">— Chris Rock</cite>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       SETTINGS
+  ═══════════════════════════════════════════ -->
+  <section id="sec-settings" class="section" aria-label="Settings">
+    <div class="section-scroll">
+      <div class="section-header">
+        <h2 class="section-title">Settings</h2>
+        <p class="section-subtitle">Manage your data &amp; preferences</p>
+      </div>
+
+      <div class="settings-group">
+        <h3 class="settings-group-title">Appearance</h3>
+        <div class="settings-row">
+          <div class="settings-row-label">
+            <span class="settings-label">Dark Mode</span>
+            <span class="settings-desc">Easy on the eyes at night</span>
+          </div>
+          <label class="toggle" aria-label="Toggle dark mode">
+            <input type="checkbox" id="dark-mode-toggle">
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <h3 class="settings-group-title">Goals</h3>
+        <div class="settings-row">
+          <div class="settings-row-label">
+            <label class="settings-label" for="monthly-target">Monthly Savings Target</label>
+            <span class="settings-desc">Your biweekly growth check goal</span>
+          </div>
+          <input type="number" id="monthly-target" class="settings-input" placeholder="900" min="0">
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <h3 class="settings-group-title">Storage</h3>
+        <div class="storage-bar-wrap" id="settings-storage-wrap">
+          <div class="storage-bar-labels">
+            <span id="storage-used-label">Calculating…</span>
+            <span id="storage-pct-label"></span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill green" id="storage-fill" style="width:0%"></div>
+          </div>
+          <div class="storage-note">localStorage limit ≈ 5MB</div>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <h3 class="settings-group-title">Data</h3>
+        <button class="settings-btn green" data-action="export-data">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Export Data as JSON
+        </button>
+        <button class="settings-btn neutral" id="import-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          Import Data from JSON
+        </button>
+        <input type="file" id="import-file" accept=".json" style="display:none">
+        <button class="settings-btn danger" data-action="reset-all-data">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+            <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+          </svg>
+          Reset All Data
+        </button>
+      </div>
+
+      <div class="settings-group">
+        <div class="app-info">
+          <div class="app-info-name">Level Up Apartment Plan</div>
+          <div class="app-info-version" id="app-version">v1.0.0</div>
+          <div class="app-info-hint">Add to iPhone Home Screen to install as app</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ═══════════════════════════════════════════
+     BOTTOM NAVIGATION
+═══════════════════════════════════════════ -->
+<nav id="bottom-nav" aria-label="Main navigation">
+  <button class="nav-btn active" data-section="dashboard" aria-label="Dashboard">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+      <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+    </svg>
+    <span class="nav-label">Home</span>
+  </button>
+  <button class="nav-btn" data-section="paychecks" aria-label="Paychecks">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="6" width="20" height="14" rx="2"/><path d="M22 10H2"/><circle cx="12" cy="15" r="2"/>
+    </svg>
+    <span class="nav-label">Pay</span>
+  </button>
+  <button class="nav-btn" data-section="purchases" aria-label="Purchases">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+      <line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+    </svg>
+    <span class="nav-label">Items</span>
+  </button>
+  <button class="nav-btn" data-section="vision" aria-label="Vision Board">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+      <polyline points="21 15 16 10 5 21"/>
+    </svg>
+    <span class="nav-label">Vision</span>
+  </button>
+  <button class="nav-btn" data-section="weekly" aria-label="Weekly Reset">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+    </svg>
+    <span class="nav-label">Weekly</span>
+  </button>
+  <button class="nav-btn" data-section="timeline" aria-label="Timeline">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/>
+      <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/>
+      <line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/>
+      <circle cx="12" cy="12" r="4"/>
+    </svg>
+    <span class="nav-label">Timeline</span>
+  </button>
+  <button class="nav-btn" data-section="rules" aria-label="Rules">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    </svg>
+    <span class="nav-label">Rules</span>
+  </button>
+  <button class="nav-btn" data-section="settings" aria-label="Settings">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+    </svg>
+    <span class="nav-label">Settings</span>
+  </button>
+</nav>
+
+<!-- ═══════════════════════════════════════════
+     MODALS
+═══════════════════════════════════════════ -->
+<!-- Add / Edit Purchase Modal -->
+<div class="modal-overlay" id="purchase-modal-overlay" role="dialog" aria-modal="true" aria-label="Add purchase">
+  <div class="modal-sheet" id="purchase-modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <h3 class="modal-title" id="purchase-modal-title">Add Purchase Item</h3>
+      <button class="modal-close" data-action="close-purchase-modal" aria-label="Close">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="purchase-edit-id">
+      <div class="form-group">
+        <label class="form-label" for="pur-name">Item Name</label>
+        <input type="text" id="pur-name" class="form-input" placeholder="e.g. Cream Area Rug">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="pur-cost">Est. Cost ($)</label>
+          <input type="number" id="pur-cost" class="form-input" placeholder="350" min="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="pur-month">Target Month</label>
+          <input type="text" id="pur-month" class="form-input" placeholder="June 2025">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="pur-priority">Priority</label>
+          <select id="pur-priority" class="form-select">
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="pur-status">Status</label>
+          <select id="pur-status" class="form-select">
+            <option value="wishlist">Wishlist</option>
+            <option value="saving">Saving</option>
+            <option value="purchased">Purchased</option>
+            <option value="delivered">Delivered</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="pur-link">Product Link (optional)</label>
+        <input type="url" id="pur-link" class="form-input" placeholder="https://…">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="pur-notes">Notes (optional)</label>
+        <textarea id="pur-notes" class="form-textarea" rows="2" placeholder="Size, color notes, etc."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-modal-cancel" data-action="close-purchase-modal">Cancel</button>
+      <button class="btn-modal-save" data-action="save-purchase">Save Item</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Modal -->
+<div class="modal-overlay" id="confirm-modal-overlay" role="dialog" aria-modal="true" aria-label="Confirm action">
+  <div class="modal-sheet modal-sheet--sm" id="confirm-modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <h3 class="modal-title" id="confirm-title">Confirm</h3>
+    </div>
+    <div class="modal-body">
+      <p class="confirm-msg" id="confirm-msg">Are you sure?</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-modal-cancel" id="confirm-cancel-btn">Cancel</button>
+      <button class="btn-modal-save danger" id="confirm-ok-btn">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
