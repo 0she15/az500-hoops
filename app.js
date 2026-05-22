@@ -680,6 +680,19 @@ function stopShotClock() {
   document.getElementById('shot-clock-wrap').classList.add('hidden');
 }
 
+function pauseShotClock() {
+  if (gameState.blitzTimer) { clearInterval(gameState.blitzTimer); gameState.blitzTimer = null; }
+}
+
+function resumeShotClock() {
+  if (gameState.mode !== 'blitz' || gameState.blitzTimer) return;
+  gameState.blitzTimer = setInterval(() => {
+    gameState.blitzRemaining--;
+    updateShotClock(gameState.blitzRemaining);
+    if (gameState.blitzRemaining <= 0) { clearInterval(gameState.blitzTimer); showResults(); }
+  }, 1000);
+}
+
 function updateShotClock(rem) {
   const ring = document.getElementById('shot-clock-ring');
   const num  = document.getElementById('shot-clock-num');
@@ -753,6 +766,7 @@ function wrongAnim(data, done) {
   setTimeout(() => fb.classList.add('hidden'), 800);
 
   playSound('wrong');
+  pauseShotClock();
 
   setTimeout(() => {
     const correctText = data.correctAnswer || '';
@@ -764,6 +778,7 @@ function wrongAnim(data, done) {
     document.getElementById('explanation-panel').classList.remove('hidden');
     document.getElementById('explanation-next-btn').onclick = () => {
       document.getElementById('explanation-panel').classList.add('hidden');
+      resumeShotClock();
       done();
     };
   }, 350);

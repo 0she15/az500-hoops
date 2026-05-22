@@ -49,8 +49,8 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   /* extend 40px beyond every edge so translate never reveals a gap */
   top: -40px; left: -40px; right: -40px; bottom: -40px;
   background-image:
-    linear-gradient(rgba(0,212,255,0.032) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,212,255,0.032) 1px, transparent 1px);
+    linear-gradient(rgba(0,212,255,0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,0.07) 1px, transparent 1px);
   background-size: 40px 40px;
   animation: bgGridScroll 28s linear infinite;
   will-change: transform;
@@ -65,9 +65,9 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 55% 38% at 18% 28%, rgba(0,212,255,0.052) 0%, transparent 70%),
-    radial-gradient(ellipse 44% 32% at 84% 72%, rgba(191,0,255,0.038) 0%, transparent 70%),
-    radial-gradient(ellipse 38% 28% at 52% 52%, rgba(255,107,0,0.022) 0%, transparent 70%);
+    radial-gradient(ellipse 55% 38% at 18% 28%, rgba(0,212,255,0.11) 0%, transparent 70%),
+    radial-gradient(ellipse 44% 32% at 84% 72%, rgba(191,0,255,0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 38% 28% at 52% 52%, rgba(255,107,0,0.045) 0%, transparent 70%);
   animation: bgFogDrift 14s ease-in-out infinite alternate;
   will-change: transform, opacity;
 }
@@ -96,14 +96,14 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   width: 300px;
   height: 300px;
   top: -100px; left: -100px;
-  background: radial-gradient(circle, rgba(0,212,255,0.09) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(0,212,255,0.18) 0%, transparent 70%);
   animation: ambientPulse 8s ease-in-out infinite;
 }
 .bg-vignette::after {
   width: 260px;
   height: 260px;
   bottom: -80px; right: -80px;
-  background: radial-gradient(circle, rgba(191,0,255,0.07) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(191,0,255,0.14) 0%, transparent 70%);
   animation: ambientPulse 10s ease-in-out infinite;
   animation-delay: -5s;
 }
@@ -142,8 +142,8 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
 
 @keyframes particleFloat {
   0%   { transform: translateY(0)        scale(0); opacity: 0; }
-  6%   { opacity: 0.55; }
-  88%  { opacity: 0.28; }
+  6%   { opacity: 0.75; }
+  88%  { opacity: 0.38; }
   100% { transform: translateY(-101vh)   scale(1); opacity: 0; }
 }
 
@@ -173,13 +173,13 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
 
 /* ═══ HOME ═══ */
 #screen-home {
-  gap: 8px;
-  padding: 12px 16px;
-  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  gap: 6px;
+  padding: 10px 16px;
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
   min-height: unset;
   height: 100dvh;
   overflow: hidden;
-  justify-content: space-between;
+  justify-content: flex-start;
 }
 
 .home-header {
@@ -402,7 +402,7 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
 .domain-pick-btn:active { transform: scale(0.95); }
 
 /* ═══ DIFFICULTY ═══ */
-.diff-row { display: flex; flex-direction: column; gap: 8px; }
+.diff-row { display: flex; flex-direction: column; gap: 8px; margin-top: auto; }
 .diff-buttons { display: flex; gap: 8px; }
 .diff-btn {
   flex: 1;
