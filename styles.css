@@ -34,6 +34,126 @@ html, body {
 
 button { cursor: pointer; border: none; background: none; font-family: var(--font-body); }
 
+/* ═══ BACKGROUND ATMOSPHERE ═══ */
+.bg-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Scrolling cyber grid — animates transform, not background-position, for GPU compositing */
+.bg-grid {
+  position: absolute;
+  /* extend 40px beyond every edge so translate never reveals a gap */
+  top: -40px; left: -40px; right: -40px; bottom: -40px;
+  background-image:
+    linear-gradient(rgba(0,212,255,0.032) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,0.032) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: bgGridScroll 28s linear infinite;
+  will-change: transform;
+}
+
+@keyframes bgGridScroll {
+  to { transform: translate(40px, 40px); }
+}
+
+/* Ambient fog blobs */
+.bg-fog {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 55% 38% at 18% 28%, rgba(0,212,255,0.052) 0%, transparent 70%),
+    radial-gradient(ellipse 44% 32% at 84% 72%, rgba(191,0,255,0.038) 0%, transparent 70%),
+    radial-gradient(ellipse 38% 28% at 52% 52%, rgba(255,107,0,0.022) 0%, transparent 70%);
+  animation: bgFogDrift 14s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+
+@keyframes bgFogDrift {
+  from { opacity: 0.65; transform: scale(1)   translate(0,    0); }
+  to   { opacity: 1;    transform: scale(1.04) translate(10px, -8px); }
+}
+
+/* Edge vignette — pure CSS radial gradient, no animation needed */
+.bg-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 88% 88% at center, transparent 32%, rgba(0,0,0,0.58) 100%);
+}
+
+/* Ambient corner glow pulses */
+.bg-vignette::before,
+.bg-vignette::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform, opacity;
+}
+.bg-vignette::before {
+  width: 300px;
+  height: 300px;
+  top: -100px; left: -100px;
+  background: radial-gradient(circle, rgba(0,212,255,0.09) 0%, transparent 70%);
+  animation: ambientPulse 8s ease-in-out infinite;
+}
+.bg-vignette::after {
+  width: 260px;
+  height: 260px;
+  bottom: -80px; right: -80px;
+  background: radial-gradient(circle, rgba(191,0,255,0.07) 0%, transparent 70%);
+  animation: ambientPulse 10s ease-in-out infinite;
+  animation-delay: -5s;
+}
+
+@keyframes ambientPulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.88); }
+  50%       { opacity: 1;   transform: scale(1.12); }
+}
+
+/* Floating particles */
+.bg-particles {
+  position: absolute;
+  inset: 0;
+}
+
+.bg-p {
+  position: absolute;
+  bottom: -4px;
+  border-radius: 50%;
+  opacity: 0;
+  animation: particleFloat linear infinite;
+  will-change: transform, opacity;
+}
+
+/* Each particle: position, size, colour, speed */
+.bg-p:nth-child(1)  { left: 7%;  width: 2px; height: 2px; background: var(--neon-blue);   animation-duration: 18s; animation-delay:  0s; }
+.bg-p:nth-child(2)  { left: 19%; width: 1px; height: 1px; background: var(--neon-blue);   animation-duration: 24s; animation-delay: -6s; }
+.bg-p:nth-child(3)  { left: 31%; width: 3px; height: 3px; background: var(--neon-purple); animation-duration: 20s; animation-delay: -3s; }
+.bg-p:nth-child(4)  { left: 43%; width: 1px; height: 1px; background: var(--neon-blue);   animation-duration: 15s; animation-delay: -9s; }
+.bg-p:nth-child(5)  { left: 53%; width: 2px; height: 2px; background: var(--neon-orange); animation-duration: 26s; animation-delay: -1s; }
+.bg-p:nth-child(6)  { left: 63%; width: 1px; height: 1px; background: var(--neon-blue);   animation-duration: 21s; animation-delay: -7s; }
+.bg-p:nth-child(7)  { left: 73%; width: 2px; height: 2px; background: var(--neon-purple); animation-duration: 22s; animation-delay: -4s; }
+.bg-p:nth-child(8)  { left: 82%; width: 3px; height: 3px; background: var(--neon-blue);   animation-duration: 17s; animation-delay: -12s; }
+.bg-p:nth-child(9)  { left: 89%; width: 1px; height: 1px; background: var(--neon-orange); animation-duration: 29s; animation-delay: -2s; }
+.bg-p:nth-child(10) { left: 46%; width: 2px; height: 2px; background: var(--neon-blue);   animation-duration: 23s; animation-delay: -15s; }
+
+@keyframes particleFloat {
+  0%   { transform: translateY(0)        scale(0); opacity: 0; }
+  6%   { opacity: 0.55; }
+  88%  { opacity: 0.28; }
+  100% { transform: translateY(-101vh)   scale(1); opacity: 0; }
+}
+
+/* Reduce everything for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .bg-grid, .bg-fog, .bg-vignette::before, .bg-vignette::after, .bg-p {
+    animation: none !important;
+  }
+}
+
 /* ═══ SCREENS ═══ */
 .screen {
   display: none;
