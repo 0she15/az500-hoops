@@ -74,6 +74,17 @@ function resetGameState(mode, difficulty, domain) {
 
 function clamp(v, min, max) { return Math.min(Math.max(v, min), max); }
 
+function animateCountUp(el, target, prefix, suffix, duration) {
+  prefix = prefix || '+'; suffix = suffix || ' XP'; duration = duration || 900;
+  const start = performance.now();
+  (function tick(now) {
+    const t    = Math.min(1, (now - start) / duration);
+    const ease = 1 - Math.pow(1 - t, 3);
+    el.textContent = prefix + Math.round(target * ease) + suffix;
+    if (t < 1) requestAnimationFrame(tick);
+  })(performance.now());
+}
+
 function arraysEqual(a, b) {
   return a.length === b.length && a.every((v, i) => v === b[i]);
 }
@@ -135,8 +146,10 @@ function updateDailyStreak() {
 // ═══ SECTION: SCREEN ROUTER ═══
 
 function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + id).classList.add('active');
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active', 'screen-enter'));
+  const next = document.getElementById('screen-' + id);
+  next.classList.add('active');
+  requestAnimationFrame(() => requestAnimationFrame(() => next.classList.add('screen-enter')));
   window.scrollTo(0, 0);
 }
 
@@ -621,8 +634,20 @@ function handlePostWrong() {
 // ═══ SECTION: HUD UPDATER ═══
 
 function updateHUD() {
-  document.getElementById('hud-streak-count').textContent = gameState.streak;
-  document.getElementById('hud-multiplier').textContent   = gameState.multiplier + 'x';
+  const streakEl = document.getElementById('hud-streak-count');
+  const multEl   = document.getElementById('hud-multiplier');
+
+  if (gameState.streak > 0) {
+    streakEl.classList.remove('streak-pulse'); void streakEl.offsetWidth;
+    streakEl.classList.add('streak-pulse');
+  }
+  if (gameState.multiplier > 1) {
+    multEl.classList.remove('mult-pop'); void multEl.offsetWidth;
+    multEl.classList.add('mult-pop');
+  }
+
+  streakEl.textContent = gameState.streak;
+  multEl.textContent   = gameState.multiplier + 'x';
 }
 
 // ═══ SECTION: SHOT CLOCK ═══
@@ -801,7 +826,7 @@ function showResults() {
 
   document.getElementById('results-title').textContent = title;
   document.getElementById('results-score').textContent = gameState.sessionCorrect;
-  document.getElementById('results-xp').textContent    = '+' + gameState.sessionXp + ' XP';
+  animateCountUp(document.getElementById('results-xp'), gameState.sessionXp);
 
   const statsEl = document.getElementById('results-stats');
   statsEl.innerHTML = '';

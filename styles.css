@@ -41,8 +41,15 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   min-height: 100vh;
   padding: 16px;
   gap: 12px;
+  opacity: 0;
+  transform: translateY(10px);
 }
 .screen.active { display: flex; }
+.screen.active.screen-enter {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.26s ease, transform 0.26s ease;
+}
 
 /* ═══ HOME ═══ */
 .home-header {
@@ -165,7 +172,7 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   height: 100%;
   background: var(--neon-blue);
   border-radius: 3px;
-  transition: width 0.5s ease;
+  transition: width 0.7s cubic-bezier(0.34, 1.0, 0.64, 1);
   box-shadow: 0 0 6px var(--neon-blue);
 }
 
@@ -1185,6 +1192,69 @@ body.screen-shake  { animation: screenShake 0.4s ease; }
 @keyframes profileSlideDown {
   from { transform: translateY(0); }
   to   { transform: translateY(100%); }
+}
+
+/* ═══ ENTRANCE ANIMATIONS ═══ */
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-10px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes cardSlideUp {
+  from { opacity: 0; transform: translateY(18px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Player card */
+.screen.screen-enter .player-card {
+  animation: cardSlideUp 0.38s cubic-bezier(0.34, 1.0, 0.64, 1) both;
+  animation-delay: 0.03s;
+}
+
+/* Mode buttons staggered */
+.screen.screen-enter .mode-btn { animation: slideInLeft 0.28s ease both; }
+.screen.screen-enter .mode-btn:nth-child(1) { animation-delay: 0.06s; }
+.screen.screen-enter .mode-btn:nth-child(2) { animation-delay: 0.11s; }
+.screen.screen-enter .mode-btn:nth-child(3) { animation-delay: 0.16s; }
+.screen.screen-enter .mode-btn:nth-child(4) { animation-delay: 0.21s; }
+.screen.screen-enter .mode-btn:nth-child(5) { animation-delay: 0.26s; }
+
+/* Results screen stagger */
+.screen.screen-enter .results-title    { animation: cardSlideUp 0.30s ease both; animation-delay: 0.04s; }
+.screen.screen-enter .results-score    { animation: cardSlideUp 0.30s ease both; animation-delay: 0.10s; }
+.screen.screen-enter .results-label    { animation: cardSlideUp 0.30s ease both; animation-delay: 0.14s; }
+.screen.screen-enter .results-xp       { animation: cardSlideUp 0.30s ease both; animation-delay: 0.20s; }
+.screen.screen-enter .results-home-btn { animation: cardSlideUp 0.30s ease both; animation-delay: 0.30s; }
+
+/* ═══ HUD ANIMATIONS ═══ */
+@keyframes streakPulse {
+  0%, 100% { transform: scale(1); }
+  40%       { transform: scale(1.3); text-shadow: 0 0 12px var(--neon-orange), 0 0 28px var(--neon-orange); }
+}
+.streak-pulse { animation: streakPulse 0.42s ease; }
+
+@keyframes multPop {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.4); box-shadow: 0 0 14px var(--neon-orange); }
+}
+.mult-pop { animation: multPop 0.30s ease; }
+
+/* ═══ BUTTON HOVER (desktop only) ═══ */
+@media (hover: hover) {
+  .mode-btn:hover { transform: translateY(-2px); filter: brightness(1.08); }
+  .mode-btn:hover:active { transform: scale(0.98); filter: none; }
+
+  .mc-option:hover:not(.correct):not(.wrong),
+  .ms-option:hover:not(.correct):not(.wrong) {
+    border-color: rgba(0,212,255,0.5);
+    transform: translateX(3px);
+  }
+
+  .submit-btn:hover:not(:disabled) { filter: brightness(1.12); transform: translateY(-1px); }
+  .next-btn:hover                  { filter: brightness(1.10); transform: translateY(-1px); }
+  .results-home-btn:hover          { filter: brightness(1.12); transform: translateY(-2px); }
+  .mc-option, .ms-option           { transition: all 0.15s, transform 0.12s; }
+  .submit-btn, .next-btn, .results-home-btn { transition: all 0.15s; }
 }
 
 /* ═══ RESPONSIVE ═══ */
