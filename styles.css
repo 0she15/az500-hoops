@@ -1466,6 +1466,42 @@ body.screen-shake  { animation: screenShake 0.4s ease; }
   font-weight: 700;
 }
 
+.profile-settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0 10px;
+  border-top: 1px solid #1a1a1a;
+  margin-top: 14px;
+}
+
+.psr-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #666;
+}
+
+.sound-toggle {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  padding: 5px 18px;
+  border-radius: 20px;
+  border: 1px solid #333;
+  color: #444;
+  background: var(--bg-elevated);
+  min-width: 58px;
+  transition: all 0.2s;
+}
+.sound-toggle.active {
+  border-color: var(--neon-green);
+  color: var(--neon-green);
+  background: rgba(57,255,20,0.08);
+  box-shadow: 0 0 8px rgba(57,255,20,0.18);
+}
+.sound-toggle:active { transform: scale(0.96); }
+
 .profile-reset-btn {
   width: 100%;
   margin-top: 20px;

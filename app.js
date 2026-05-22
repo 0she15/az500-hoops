@@ -550,6 +550,9 @@ function submitAnswer(correct, q) {
     gameState.streak++;
     if (gameState.streak > playerState.bestStreak) playerState.bestStreak = gameState.streak;
     gameState.multiplier = gameState.streak >= 7 ? 4 : gameState.streak >= 5 ? 3 : gameState.streak >= 3 ? 2 : 1;
+    if      (gameState.streak === 3) playSound('streak', 1);
+    else if (gameState.streak === 5) playSound('streak', 2);
+    else if (gameState.streak === 7) playSound('streak', 3);
     gameState.sessionCorrect++;
     gameState.domainStreak = (gameState.domain === null || q.domain === gameState.domain) ? gameState.domainStreak + 1 : 0;
 
@@ -685,11 +688,10 @@ function updateShotClock(rem) {
   const urgent = rem <= 10;
   ring.classList.toggle('urgent', urgent);
   num.classList.toggle('urgent', urgent);
+  if (urgent && rem > 0) playSound('tick');
 }
 
 // ═══ SECTION: ANIMATIONS ═══
-
-function playSound(name) { /* placeholder — wire Web Audio API or <audio> elements here */ }
 
 function getCorrectAnswerText(q) {
   if (q.type === 'mc')    return q.options[q.answer];
@@ -722,6 +724,7 @@ function correctAnim(data, done) {
   xpEl.className = 'floating-xp animating';
 
   playSound('correct');
+  setTimeout(() => playSound('xp'), 440);
 
   setTimeout(() => {
     document.body.classList.remove('correct-flash');
@@ -788,6 +791,7 @@ function showLevelUp() {
   card.style.animation = 'none'; void card.offsetWidth; card.style.animation = '';
   document.getElementById('overlay-level-up').classList.remove('hidden');
   startConfetti();
+  playSound('levelup');
   document.getElementById('lu-tap-btn').onclick = () => {
     document.getElementById('overlay-level-up').classList.add('hidden');
     stopConfetti();
@@ -853,6 +857,7 @@ function awardBadge(id) {
   if (playerState.badges.includes(id)) return;
   playerState.badges.push(id);
   savePlayer();
+  playSound('achievement');
   const toast = document.getElementById('badge-toast');
   toast.textContent = '🏅 BADGE: ' + (BADGE_DEFS[id] ? BADGE_DEFS[id].label : id);
   toast.classList.remove('hidden');
@@ -910,6 +915,7 @@ function startGame(mode, difficulty, domain) {
   document.getElementById('overlay-level-up').classList.add('hidden');
   showScreen('game');
   document.getElementById('hud-mode').textContent = MODE_LABELS[mode] || mode.toUpperCase();
+  if (mode === 'bossBattle') playSound('boss');
   if (mode === 'blitz') startShotClock();
   loadNextQuestion();
 }
@@ -979,6 +985,12 @@ function openProfile() {
     badgesEl.appendChild(chip);
   });
 
+  const toggleBtn = document.getElementById('sound-toggle');
+  if (toggleBtn) {
+    toggleBtn.textContent = SoundManager.enabled ? 'ON' : 'OFF';
+    toggleBtn.classList.toggle('active', SoundManager.enabled);
+  }
+
   const panel = document.getElementById('profile-panel');
   panel.classList.remove('closing');
   panel.scrollTop = 0;
@@ -997,8 +1009,16 @@ function closeProfile() {
 // ═══ SECTION: EVENT LISTENERS & INIT ═══
 
 function initApp() {
+  SoundManager.loadPref();
   loadPlayer();
   updateDailyStreak();
+
+  // Global tap sound — fires on every button press before other handlers
+  // Excluded: sound-toggle itself (handled separately to avoid double-firing)
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('button');
+    if (btn && btn.id !== 'sound-toggle') playSound('tap');
+  }, { capture: true });
 
   // Mode buttons
   document.querySelectorAll('.mode-btn').forEach(btn => {
@@ -1065,6 +1085,19 @@ function initApp() {
   document.getElementById('profile-close').addEventListener('click', closeProfile);
   document.getElementById('overlay-profile').addEventListener('click', e => {
     if (e.target === document.getElementById('overlay-profile')) closeProfile();
+  });
+
+  // Sound toggle
+  document.getElementById('sound-toggle').addEventListener('click', () => {
+    if (SoundManager.enabled) {
+      SoundManager.disable();
+    } else {
+      SoundManager.enable();
+      setTimeout(() => playSound('tap'), 20); // first sound after enabling
+    }
+    const btn = document.getElementById('sound-toggle');
+    btn.textContent = SoundManager.enabled ? 'ON' : 'OFF';
+    btn.classList.toggle('active', SoundManager.enabled);
   });
 
   renderHomeScreen();
