@@ -170,7 +170,14 @@
   </div>
 
   <div id="explanation-panel" class="explanation-panel hidden">
-    <div class="exp-label">ANALYSIS</div>
+    <div class="exp-header">
+      <span class="exp-label">ANALYSIS</span>
+      <span class="exp-verdict" id="exp-verdict"></span>
+    </div>
+    <div class="exp-correct-block" id="exp-correct-block">
+      <div class="exp-correct-label">CORRECT ANSWER</div>
+      <div class="exp-correct-text" id="exp-correct-text"></div>
+    </div>
     <div id="explanation-text" class="explanation-text"></div>
     <button id="explanation-next-btn" class="next-btn">NEXT PLAY →</button>
   </div>
@@ -190,6 +197,7 @@
 <!-- ═══ OVERLAYS ═══ -->
 
 <div id="overlay-feedback" class="overlay hidden">
+  <div id="fb-result" class="fb-result"></div>
   <div id="feedback-text" class="feedback-text"></div>
 </div>
 

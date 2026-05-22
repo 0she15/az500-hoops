@@ -592,7 +592,7 @@ function submitAnswer(correct, q) {
     savePlayer();
     updateHUD();
 
-    wrongAnim({ explanation: q.explanation }, () => {
+    wrongAnim({ explanation: q.explanation, correctAnswer: getCorrectAnswerText(q) }, () => {
       handlePostWrong();
     });
   }
@@ -689,27 +689,45 @@ function updateShotClock(rem) {
 
 // ═══ SECTION: ANIMATIONS ═══
 
+function playSound(name) { /* placeholder — wire Web Audio API or <audio> elements here */ }
+
+function getCorrectAnswerText(q) {
+  if (q.type === 'mc')    return q.options[q.answer];
+  if (q.type === 'ms')    return q.answers.map(i => q.options[i]).join(' · ');
+  if (q.type === 'order') return q.items.join(' → ');
+  return '';
+}
+
 function correctAnim(data, done) {
   document.body.classList.remove('correct-flash'); void document.body.offsetWidth;
   document.body.classList.add('correct-flash');
 
-  const fb = document.getElementById('overlay-feedback');
-  const ft = document.getElementById('feedback-text');
-  // Force animation replay
+  const fb     = document.getElementById('overlay-feedback');
+  const ft     = document.getElementById('feedback-text');
+  const fbRes  = document.getElementById('fb-result');
   ft.style.animation = 'none'; void ft.offsetWidth; ft.style.animation = '';
-  ft.className = 'feedback-text';
+  fbRes.style.animation = 'none'; void fbRes.offsetWidth; fbRes.style.animation = '';
+  ft.className  = 'feedback-text';
   ft.textContent = data.callout || 'NICE!';
+  fbRes.className   = 'fb-result fb-result-correct';
+  fbRes.textContent = '✓ CORRECT';
   fb.classList.remove('hidden');
+
+  const qw = document.querySelector('.question-wrap');
+  if (qw) { qw.classList.remove('correct-glow'); void qw.offsetWidth; qw.classList.add('correct-glow'); }
 
   const xpEl = document.getElementById('floating-xp');
   xpEl.style.animation = 'none'; void xpEl.offsetWidth; xpEl.style.animation = '';
   xpEl.textContent = '+' + data.xp + ' XP';
   xpEl.className = 'floating-xp animating';
 
+  playSound('correct');
+
   setTimeout(() => {
     document.body.classList.remove('correct-flash');
     fb.classList.add('hidden');
     xpEl.className = 'floating-xp hidden';
+    if (qw) qw.classList.remove('correct-glow');
     done();
   }, 900);
 }
@@ -719,12 +737,33 @@ function wrongAnim(data, done) {
   document.body.classList.add('wrong-flash', 'screen-shake');
   setTimeout(() => document.body.classList.remove('wrong-flash', 'screen-shake'), 400);
 
-  document.getElementById('explanation-text').textContent = data.explanation || '';
-  document.getElementById('explanation-panel').classList.remove('hidden');
-  document.getElementById('explanation-next-btn').onclick = () => {
-    document.getElementById('explanation-panel').classList.add('hidden');
-    done();
-  };
+  const fb    = document.getElementById('overlay-feedback');
+  const ft    = document.getElementById('feedback-text');
+  const fbRes = document.getElementById('fb-result');
+  ft.style.animation = 'none'; void ft.offsetWidth; ft.style.animation = '';
+  fbRes.style.animation = 'none'; void fbRes.offsetWidth; fbRes.style.animation = '';
+  ft.className  = 'feedback-text wrong-text';
+  ft.textContent = 'WRONG';
+  fbRes.className   = 'fb-result fb-result-wrong';
+  fbRes.textContent = '✗';
+  fb.classList.remove('hidden');
+  setTimeout(() => fb.classList.add('hidden'), 800);
+
+  playSound('wrong');
+
+  setTimeout(() => {
+    const correctText = data.correctAnswer || '';
+    const correctBlock = document.getElementById('exp-correct-block');
+    document.getElementById('exp-correct-text').textContent = correctText;
+    correctBlock.style.display = correctText ? '' : 'none';
+    document.getElementById('exp-verdict').textContent = '✗ WRONG';
+    document.getElementById('explanation-text').textContent = data.explanation || '';
+    document.getElementById('explanation-panel').classList.remove('hidden');
+    document.getElementById('explanation-next-btn').onclick = () => {
+      document.getElementById('explanation-panel').classList.add('hidden');
+      done();
+    };
+  }, 350);
 }
 
 function streakAnim(data, done) {
