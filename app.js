@@ -203,9 +203,6 @@ function renderPlayerCard() {
     badgeEl.appendChild(chip);
   });
 
-  document.getElementById('hs-blitz').textContent  = playerState.highScores.blitz;
-  document.getElementById('hs-sudden').textContent = playerState.highScores.suddenDeath;
-  document.getElementById('hs-boss').textContent   = playerState.highScores.bossBattle;
   document.getElementById('daily-streak-num').textContent = playerState.dailyStreak;
 }
 
@@ -912,6 +909,9 @@ function openProfile() {
     { name: 'BOSS',    score: hs.bossBattle }
   ].reduce((a, b) => a.score >= b.score ? a : b);
   document.getElementById('profile-best-mode').textContent = modeBest.score > 0 ? modeBest.name : '—';
+  document.getElementById('profile-hs-blitz').textContent  = hs.blitz;
+  document.getElementById('profile-hs-sudden').textContent = hs.suddenDeath;
+  document.getElementById('profile-hs-boss').textContent   = hs.bossBattle;
 
   const domsEl = document.getElementById('profile-domains');
   domsEl.innerHTML = '';
@@ -1015,8 +1015,11 @@ function initApp() {
     renderHomeScreen();
   });
 
-  // Reset
-  document.getElementById('reset-btn').addEventListener('click', resetPlayer);
+  // Reset (lives in profile overlay)
+  document.getElementById('profile-reset-btn').addEventListener('click', () => {
+    document.getElementById('overlay-profile').classList.add('hidden');
+    resetPlayer();
+  });
 
   // Player profile
   document.getElementById('profile-trigger').addEventListener('click', openProfile);

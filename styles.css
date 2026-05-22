@@ -52,6 +52,16 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
 }
 
 /* ═══ HOME ═══ */
+#screen-home {
+  gap: 8px;
+  padding: 12px 16px;
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  min-height: unset;
+  height: 100dvh;
+  overflow: hidden;
+  justify-content: space-between;
+}
+
 .home-header {
   display: flex;
   justify-content: space-between;
@@ -86,7 +96,7 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   background: var(--bg-card);
   border: 2px solid var(--neon-blue);
   border-radius: var(--radius);
-  padding: 16px;
+  padding: 12px 14px;
   box-shadow: var(--glow-blue);
   transition: border-color 0.4s, box-shadow 0.4s;
 }
@@ -150,7 +160,7 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 12px;
+  margin-top: 8px;
 }
 
 .xp-label {
@@ -211,8 +221,8 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   align-items: center;
   gap: 12px;
   width: 100%;
-  min-height: var(--tap-min);
-  padding: 10px 16px;
+  min-height: 40px;
+  padding: 7px 14px;
   background: var(--bg-elevated);
   border: 2px solid var(--neon-blue);
   border-radius: var(--radius);
@@ -1249,6 +1259,42 @@ body.screen-shake  { animation: screenShake 0.4s ease; }
   border-radius: 4px;
   padding: 4px 8px;
 }
+
+.profile-hs {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.profile-hs-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: #666;
+  padding: 6px 0;
+  border-bottom: 1px solid #1a1a1a;
+}
+
+.profile-hs-row span:last-child {
+  color: var(--neon-blue);
+  font-weight: 700;
+}
+
+.profile-reset-btn {
+  width: 100%;
+  margin-top: 20px;
+  padding: 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #555;
+  border: 1px solid #2a2a2a;
+  border-radius: var(--radius);
+  background: transparent;
+  transition: all 0.15s;
+}
+.profile-reset-btn:active { color: var(--neon-red); border-color: var(--neon-red); }
 
 @keyframes profileSlideUp {
   from { transform: translateY(100%); }
