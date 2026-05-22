@@ -34,6 +34,8 @@ const BADGE_DEFS = {
   STREAK_10:         { label: '🔥 STREAK 10' }
 };
 
+const MODE_LABELS = { career: 'CAREER', blitz: 'BLITZ', bossBattle: 'BOSS', suddenDeath: 'SUDDEN', domainMastery: 'MASTERY' };
+
 // ═══ SECTION: STATE OBJECTS ═══
 
 const DEFAULT_PLAYER = () => ({
@@ -66,7 +68,8 @@ function resetGameState(mode, difficulty, domain) {
     selectedOrderItems: [],
     selectedMatchLeft: null, matchedPairs: [],
     yesnoAnswers: [],
-    blankAnswers: []
+    blankAnswers: [],
+    questionsShown: 0
   };
 }
 
@@ -648,6 +651,13 @@ function updateHUD() {
 
   streakEl.textContent = gameState.streak;
   multEl.textContent   = gameState.multiplier + 'x';
+
+  const qNumEl = document.getElementById('hud-q-num');
+  if (qNumEl) qNumEl.textContent = gameState.questionsShown;
+
+  const segs = document.querySelectorAll('.streak-seg');
+  const lit = Math.min(gameState.streak, 7);
+  segs.forEach((seg, i) => seg.classList.toggle('active', i < lit));
 }
 
 // ═══ SECTION: SHOT CLOCK ═══
@@ -863,11 +873,13 @@ function startGame(mode, difficulty, domain) {
   document.getElementById('overlay-boss-fail').classList.add('hidden');
   document.getElementById('overlay-level-up').classList.add('hidden');
   showScreen('game');
+  document.getElementById('hud-mode').textContent = MODE_LABELS[mode] || mode.toUpperCase();
   if (mode === 'blitz') startShotClock();
   loadNextQuestion();
 }
 
 function loadNextQuestion() {
+  gameState.questionsShown++;
   const diff = gameState.mode === 'bossBattle' ? 'elite' : gameState.difficulty;
   renderQuestion(selectQuestion(gameState.domain, diff));
   updateHUD();

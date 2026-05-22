@@ -356,29 +356,95 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 3px;
 }
 
-.hud-domain {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 3px;
-  color: #555;
-}
-
-.hud-streak {
+/* info row: domain chip · mode chip · question counter */
+.hud-info-row {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
 }
 
-.streak-fire { font-size: 16px; }
+.hud-domain-chip {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--neon-blue);
+  background: rgba(0,212,255,0.08);
+  border: 1px solid rgba(0,212,255,0.35);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+
+.hud-mode-chip {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #888;
+  background: var(--bg-elevated);
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+
+.hud-q-chip {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #666;
+  padding: 1px 4px;
+}
+
+/* streak row */
+.hud-streak-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.streak-fire { font-size: 14px; }
 
 #hud-streak-count {
   font-family: var(--font-display);
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 700;
   color: #fff;
+  min-width: 22px;
+  text-align: center;
+}
+
+/* 7-segment streak meter */
+.streak-meter {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.streak-seg {
+  width: 7px;
+  height: 13px;
+  border-radius: 2px;
+  background: #222;
+  border: 1px solid #333;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.streak-seg.active:nth-child(-n+3) {
+  background: #c8a000;
+  border-color: #ffd700;
+  box-shadow: 0 0 4px #ffd700;
+}
+
+.streak-seg.active:nth-child(n+4):nth-child(-n+5) {
+  background: #c84000;
+  border-color: var(--neon-orange);
+  box-shadow: 0 0 4px var(--neon-orange);
+}
+
+.streak-seg.active:nth-child(n+6) {
+  background: #8b0000;
+  border-color: var(--neon-red);
+  box-shadow: 0 0 6px var(--neon-red);
 }
 
 .hud-mult {
