@@ -175,7 +175,7 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
 #screen-home {
   gap: 6px;
   padding: 10px 16px;
-  padding-bottom: max(10px, env(safe-area-inset-bottom));
+  padding-bottom: max(22px, env(safe-area-inset-bottom));
   min-height: unset;
   height: 100dvh;
   overflow: hidden;
@@ -219,6 +219,7 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   padding: 12px 14px;
   box-shadow: var(--glow-blue);
   transition: border-color 0.4s, box-shadow 0.4s;
+  margin-bottom: 8px;
 }
 .player-card.rank-rookie   { border-color: #333;                  box-shadow: none; }
 .player-card.rank-prospect { border-color: #445566;               box-shadow: none; }
@@ -376,7 +377,7 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   width: 100%;
   min-height: 40px;
   padding: 7px 14px;
-  background: var(--bg-elevated);
+  background: rgba(16,16,20,0.72);
   border: 2px solid var(--neon-blue);
   border-radius: var(--radius);
   color: #fff;
@@ -492,8 +493,8 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--bg-card);
-  border-bottom: 2px solid #1a1a1a;
+  background: rgba(10,10,10,0.88);
+  border-bottom: 1px solid rgba(0,212,255,0.1);
   padding: 8px 12px;
   gap: 12px;
   position: sticky;
@@ -502,16 +503,20 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
 }
 
 .hud-home-btn {
-  font-size: 20px;
-  color: #888;
+  color: var(--neon-blue);
   min-width: 40px;
   min-height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: var(--radius);
-  background: var(--bg-elevated);
-  border: 1px solid #333;
+  background: rgba(0,212,255,0.07);
+  border: 1px solid rgba(0,212,255,0.28);
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.hud-home-btn:active {
+  background: rgba(0,212,255,0.18);
+  box-shadow: 0 0 8px rgba(0,212,255,0.28);
 }
 
 .hud-center {
@@ -685,8 +690,8 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
 .mc-option, .ms-option {
   min-height: var(--tap-min);
   padding: 12px 16px;
-  background: var(--bg-elevated);
-  border: 2px solid #2a2a2a;
+  background: rgba(20,20,26,0.78);
+  border: 1px solid #2a2a2a;
   border-radius: var(--radius);
   color: #ccc;
   font-family: var(--font-body);
@@ -1229,6 +1234,90 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   max-width: 240px;
 }
 .badge-toast.hidden { display: none; }
+
+/* ═══ MODE INTRO OVERLAY ═══ */
+.overlay-intro {
+  background: rgba(0,0,0,0.92);
+  flex-direction: column;
+  z-index: 150;
+  cursor: pointer;
+}
+
+.intro-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 52px 32px;
+  text-align: center;
+  max-width: 340px;
+  width: 100%;
+  animation: introCardIn 0.32s cubic-bezier(0.34, 1.0, 0.64, 1) forwards;
+}
+
+@keyframes introCardIn {
+  from { opacity: 0; transform: scale(0.9) translateY(12px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.intro-icon {
+  font-size: 72px;
+  line-height: 1;
+  margin-bottom: 4px;
+  animation: introIconPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes introIconPop {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.intro-mode {
+  font-family: var(--font-display);
+  font-size: 44px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  line-height: 1;
+  color: var(--neon-blue);
+  text-shadow: var(--glow-blue);
+}
+
+.intro-tagline {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--neon-orange);
+  text-shadow: 0 0 8px rgba(255,107,0,0.6);
+}
+
+.intro-rule {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: #666;
+  line-height: 1.55;
+  max-width: 260px;
+  margin-top: 2px;
+}
+
+.intro-divider {
+  width: 48px;
+  height: 1px;
+  background: rgba(255,255,255,0.12);
+  margin: 10px 0 4px;
+}
+
+.intro-tap {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: #555;
+  animation: introBlink 1.4s ease-in-out infinite;
+}
+
+@keyframes introBlink {
+  0%, 100% { opacity: 0.35; }
+  50%       { opacity: 1; }
+}
 
 /* ═══ ANIMATIONS ═══ */
 @keyframes correctFlash {

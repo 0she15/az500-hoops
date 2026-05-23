@@ -38,6 +38,14 @@ const BADGE_DEFS = {
 
 const MODE_LABELS = { career: 'CAREER', blitz: 'BLITZ', bossBattle: 'BOSS', suddenDeath: 'SUDDEN', domainMastery: 'MASTERY' };
 
+const INTRO_CONFIGS = {
+  career:        { icon: '🏀', label: 'CAREER',         tagline: 'UNLIMITED PLAY',                   rule: 'XP always on — answer and grow your rating',            color: '#00d4ff' },
+  blitz:         { icon: '⚡', label: 'BLITZ',           tagline: '60 SECOND SHOT CLOCK',             rule: 'Answer as many as you can before the buzzer',           color: '#ff6b00' },
+  bossBattle:    { icon: '💀', label: 'BOSS BATTLE',     tagline: 'ELITE ONLY · 1 MISS = GAME OVER',  rule: 'Chain 10 flawless elite answers to slay the boss',      color: '#ff2244' },
+  suddenDeath:   { icon: '🎯', label: 'SUDDEN DEATH',   tagline: 'ONE AND DONE',                     rule: 'One wrong answer ends your run — no second chances',    color: '#bf00ff' },
+  domainMastery: { icon: '🎓', label: 'MASTERY',        tagline: '5 STREAK IN ONE DOMAIN',           rule: 'Stay locked in — 5 correct in a row to win',           color: '#39ff14' },
+};
+
 const ACHIEVEMENT_DEFS = {
   FIRST_CORRECT:  { label: '🏀 First Bucket',   desc: 'Answer your first question correctly' },
   STREAK_3:       { label: '🔥 Hat Trick',       desc: '3 correct answers in a row' },
@@ -828,8 +836,8 @@ function wrongAnim(data, done) {
     document.getElementById('explanation-panel').classList.remove('hidden');
     document.getElementById('explanation-next-btn').onclick = () => {
       document.getElementById('explanation-panel').classList.add('hidden');
-      resumeShotClock();
       done();
+      resumeShotClock();
     };
   }, 350);
 }
@@ -1012,6 +1020,33 @@ function showResults() {
 
 // ═══ SECTION: GAME STARTER ═══
 
+function showIntro(mode, cb) {
+  const cfg = INTRO_CONFIGS[mode];
+  if (!cfg) { cb(); return; }
+
+  const modeEl = document.getElementById('intro-mode');
+  document.getElementById('intro-icon').textContent    = cfg.icon;
+  modeEl.textContent                                   = cfg.label;
+  modeEl.style.color                                   = cfg.color;
+  modeEl.style.textShadow                              = `0 0 10px ${cfg.color}88, 0 0 24px ${cfg.color}44`;
+  const tagEl = document.getElementById('intro-tagline');
+  tagEl.textContent  = cfg.tagline;
+  tagEl.style.color  = cfg.color;
+  tagEl.style.textShadow = `0 0 8px ${cfg.color}66`;
+  document.getElementById('intro-rule').textContent    = cfg.rule;
+
+  const card = document.getElementById('intro-card');
+  card.style.animation = 'none'; void card.offsetWidth; card.style.animation = '';
+
+  const overlay = document.getElementById('overlay-intro');
+  overlay.classList.remove('hidden');
+  overlay.addEventListener('click', function dismiss() {
+    overlay.classList.add('hidden');
+    overlay.removeEventListener('click', dismiss);
+    cb();
+  });
+}
+
 function startGame(mode, difficulty, domain) {
   resetGameState(mode, difficulty, domain);
   stopShotClock();
@@ -1019,9 +1054,11 @@ function startGame(mode, difficulty, domain) {
   document.getElementById('overlay-level-up').classList.add('hidden');
   showScreen('game');
   document.getElementById('hud-mode').textContent = MODE_LABELS[mode] || mode.toUpperCase();
-  if (mode === 'bossBattle') playSound('boss');
-  if (mode === 'blitz') startShotClock();
   loadNextQuestion();
+  showIntro(mode, () => {
+    if (mode === 'bossBattle') playSound('boss');
+    if (mode === 'blitz') startShotClock();
+  });
 }
 
 function loadNextQuestion() {

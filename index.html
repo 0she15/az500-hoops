@@ -145,7 +145,9 @@
 <!-- ═══ GAME SCREEN ═══ -->
 <div id="screen-game" class="screen">
   <div class="hud-bar">
-    <button class="hud-home-btn" id="hud-home-btn">⬅</button>
+    <button class="hud-home-btn" id="hud-home-btn" aria-label="Back to home">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
     <div class="hud-center">
       <div class="hud-info-row">
         <span class="hud-domain-chip" id="hud-domain">NET</span>
@@ -252,6 +254,18 @@
 </div>
 
 <div id="badge-toast" class="badge-toast hidden"></div>
+
+<!-- ═══ MODE INTRO OVERLAY ═══ -->
+<div id="overlay-intro" class="overlay overlay-intro hidden">
+  <div class="intro-card" id="intro-card">
+    <div class="intro-icon" id="intro-icon">⚡</div>
+    <div class="intro-mode" id="intro-mode">BLITZ</div>
+    <div class="intro-tagline" id="intro-tagline">60 SECOND SHOT CLOCK</div>
+    <div class="intro-rule" id="intro-rule"></div>
+    <div class="intro-divider"></div>
+    <div class="intro-tap">TAP ANYWHERE TO START</div>
+  </div>
+</div>
 
 <!-- ═══ PLAYER PROFILE OVERLAY ═══ -->
 <div id="overlay-profile" class="overlay overlay-profile hidden">
