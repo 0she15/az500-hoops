@@ -271,7 +271,10 @@ function renderHomeScreen() {
 
 // ═══ SECTION: QUESTION SELECTOR ═══
 
-function selectQuestion(domain, difficulty) {
+// Types suitable for timed Blitz play — fast to read and answer
+const BLITZ_TYPES = new Set(['mc', 'yesno', 'blank']);
+
+function selectQuestion(domain, difficulty, fastOnly) {
   let pool = QUESTION_BANK.filter(q =>
     (!domain || q.domain === domain) &&
     (!difficulty || difficulty === 'auto' || q.difficulty === difficulty)
@@ -285,6 +288,11 @@ function selectQuestion(domain, difficulty) {
     else if (r < 85) pool = pool.filter(q => rand < 0.4 ? q.difficulty === 'rookie' : rand < 0.9 ? q.difficulty === 'veteran' : q.difficulty === 'elite');
     else             pool = pool.filter(q => rand < 0.2 ? q.difficulty === 'veteran' : q.difficulty === 'elite');
     if (pool.length === 0) pool = QUESTION_BANK.filter(q => !domain || q.domain === domain);
+  }
+
+  if (fastOnly) {
+    const fast = pool.filter(q => BLITZ_TYPES.has(q.type));
+    if (fast.length > 0) pool = fast;
   }
 
   if (pool.length === 0) pool = QUESTION_BANK;
@@ -1063,8 +1071,9 @@ function startGame(mode, difficulty, domain) {
 
 function loadNextQuestion() {
   gameState.questionsShown++;
-  const diff = gameState.mode === 'bossBattle' ? 'elite' : gameState.difficulty;
-  renderQuestion(selectQuestion(gameState.domain, diff));
+  const diff     = gameState.mode === 'bossBattle' ? 'elite' : gameState.difficulty;
+  const fastOnly = gameState.mode === 'blitz';
+  renderQuestion(selectQuestion(gameState.domain, diff, fastOnly));
   updateHUD();
 }
 

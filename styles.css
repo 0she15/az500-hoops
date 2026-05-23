@@ -22,14 +22,21 @@
 /* ═══ RESET & BASE ═══ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+html {
+  background: var(--bg); /* canvas fallback — bg-layer renders on top of this */
+}
+
 html, body {
   width: 100%; min-height: 100vh;
-  background: var(--bg);
   color: #fff;
   font-family: var(--font-body);
   font-size: 16px;
   overflow-x: hidden;
   -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: transparent; /* let bg-layer (z-index:-1) show through */
 }
 
 button { cursor: pointer; border: none; background: none; font-family: var(--font-body); }
@@ -219,7 +226,7 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   padding: 12px 14px;
   box-shadow: var(--glow-blue);
   transition: border-color 0.4s, box-shadow 0.4s;
-  margin-bottom: 8px;
+  margin-bottom: 14px;
 }
 .player-card.rank-rookie   { border-color: #333;                  box-shadow: none; }
 .player-card.rank-prospect { border-color: #445566;               box-shadow: none; }
