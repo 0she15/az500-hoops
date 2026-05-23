@@ -1,12 +1,14 @@
 // ═══ SECTION: CONFIG & CONSTANTS ═══
 
 const RANK_THRESHOLDS = [
-  { min: 97, rank: 'Legend',    cls: 'rank-legend' },
-  { min: 93, rank: 'Superstar', cls: 'rank-superstar' },
-  { min: 85, rank: 'Veteran',   cls: 'rank-veteran' },
-  { min: 75, rank: 'All-Star',  cls: 'rank-allstar' },
-  { min: 65, rank: 'Pro',       cls: 'rank-pro' },
-  { min: 0,  rank: 'Rookie',    cls: 'rank-rookie' }
+  { min: 97, rank: 'Azure Legend', cls: 'rank-legend',   color: '#00d4ff' },
+  { min: 90, rank: 'Hall of Fame', cls: 'rank-hof',      color: '#bf00ff' },
+  { min: 82, rank: 'All-Pro',      cls: 'rank-allpro',   color: '#ff6b00' },
+  { min: 74, rank: 'Elite',        cls: 'rank-elite',    color: '#39ff14' },
+  { min: 67, rank: 'Veteran',      cls: 'rank-veteran',  color: '#00d4ff' },
+  { min: 61, rank: 'Starter',      cls: 'rank-starter',  color: '#aaddff' },
+  { min: 57, rank: 'Prospect',     cls: 'rank-prospect', color: '#778899' },
+  { min: 0,  rank: 'Rookie',       cls: 'rank-rookie',   color: '#555566' }
 ];
 
 const DOMAIN_COLORS = {
@@ -36,6 +38,25 @@ const BADGE_DEFS = {
 
 const MODE_LABELS = { career: 'CAREER', blitz: 'BLITZ', bossBattle: 'BOSS', suddenDeath: 'SUDDEN', domainMastery: 'MASTERY' };
 
+const ACHIEVEMENT_DEFS = {
+  FIRST_CORRECT:  { label: '🏀 First Bucket',   desc: 'Answer your first question correctly' },
+  STREAK_3:       { label: '🔥 Hat Trick',       desc: '3 correct answers in a row' },
+  STREAK_5:       { label: '⚡ On Fire',          desc: '5 correct answers in a row' },
+  STREAK_DIME:    { label: '💥 Dime Dropper',    desc: '10 correct answers in a row' },
+  LEVEL_5:        { label: '📈 Level 5',         desc: 'Reach player level 5' },
+  LEVEL_10:       { label: '🚀 Level 10',        desc: 'Reach player level 10' },
+  RANK_STARTER:   { label: '👟 Starter',         desc: 'Reach Starter rank (61+ rating)' },
+  RANK_VETERAN:   { label: '🏅 Veteran',         desc: 'Reach Veteran rank (67+ rating)' },
+  RANK_ELITE:     { label: '⭐ Elite Rated',     desc: 'Reach Elite rank (74+ rating)' },
+  RANK_ALLPRO:    { label: '🌟 All-Pro',         desc: 'Reach All-Pro rank (82+ rating)' },
+  RANK_HOF:       { label: '🏆 Hall of Fame',    desc: 'Reach Hall of Fame rank (90+ rating)' },
+  RANK_LEGEND:    { label: '👑 Azure Legend',    desc: 'Reach Azure Legend rank (97+ rating)' },
+  SHARP_SHOOTER:  { label: '🎯 Sharp Shooter',   desc: '90%+ accuracy after 20+ questions' },
+  BLITZ_25:       { label: '⚡ Blitz Scorer',    desc: 'Get 25+ correct in a single Blitz' },
+  ANSWERED_100:   { label: '💯 Century',         desc: 'Answer 100 questions total' },
+  DAILY_7:        { label: '🗓 Week Streak',     desc: 'Play 7 days in a row' },
+};
+
 // ═══ SECTION: STATE OBJECTS ═══
 
 const DEFAULT_PLAYER = () => ({
@@ -47,9 +68,12 @@ const DEFAULT_PLAYER = () => ({
   domainMastery: { NET: 0, IDN: 0, CMP: 0, DFC: 0, STR: 0 },
   dailyStreak: 0, lastPlayDate: null, questionsToday: 0,
   badges: [],
+  achievements: [],
   usedQuestions: [],
   bestStreak: 0, totalAnswered: 0, totalCorrect: 0
 });
+
+let _pendingBadgeAnims = new Set();
 
 let playerState = DEFAULT_PLAYER();
 
@@ -113,6 +137,7 @@ function loadPlayer() {
         playerState.bestStreak    = playerState.bestStreak    ?? 0;
         playerState.totalAnswered = playerState.totalAnswered ?? 0;
         playerState.totalCorrect  = playerState.totalCorrect  ?? 0;
+        playerState.achievements  = playerState.achievements  ?? [];
       }
     }
   } catch(e) {}
@@ -162,6 +187,19 @@ function getRankInfo(rating) {
   return RANK_THRESHOLDS.find(r => rating >= r.min);
 }
 
+function getNextRank(rating) {
+  const idx = RANK_THRESHOLDS.findIndex(r => rating >= r.min);
+  return idx > 0 ? RANK_THRESHOLDS[idx - 1] : null;
+}
+
+function getRankProgress(rating) {
+  const idx = RANK_THRESHOLDS.findIndex(r => rating >= r.min);
+  if (idx === 0) return 100;
+  const cur = RANK_THRESHOLDS[idx];
+  const nxt = RANK_THRESHOLDS[idx - 1];
+  return Math.round(((rating - cur.min) / (nxt.min - cur.min)) * 100);
+}
+
 function drawMasteryRing(canvas, pct, color) {
   const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height, cx = W / 2, cy = H / 2, r = W / 2 - 3;
@@ -176,11 +214,22 @@ function drawMasteryRing(canvas, pct, color) {
 }
 
 function renderPlayerCard() {
-  const ri = getRankInfo(playerState.rating);
+  const ri   = getRankInfo(playerState.rating);
+  const nxt  = getNextRank(playerState.rating);
+  const pct  = getRankProgress(playerState.rating);
+
   document.getElementById('card-rating').textContent = playerState.rating;
+  document.getElementById('card-rating').style.color = ri.color;
+  document.getElementById('card-rating').style.textShadow = `0 0 10px ${ri.color}88, 0 0 20px ${ri.color}44`;
   document.getElementById('card-rank-label').textContent = ri.rank.toUpperCase();
+  document.getElementById('card-rank-label').style.color = ri.color;
   document.getElementById('card-level').textContent = playerState.level;
   document.getElementById('player-card').className = 'player-card ' + ri.cls;
+
+  const rankBar  = document.getElementById('card-rank-bar');
+  const rankNext = document.getElementById('card-rank-next');
+  if (rankBar)  { rankBar.style.width = pct + '%'; rankBar.style.background = ri.color; }
+  if (rankNext) { rankNext.textContent = nxt ? 'TO ' + nxt.rank.toUpperCase() + ' ›' : ''; }
 
   ['NET','IDN','CMP','DFC','STR'].forEach(d => {
     document.getElementById('stat-' + d).textContent = Math.floor(playerState.stats[d]);
@@ -569,6 +618,7 @@ function submitAnswer(correct, q) {
     while (playerState.xp >= LEVEL_XP(playerState.level)) playerState.level++;
     savePlayer();
     updateHUD();
+    checkAchievements();
 
     const didLevelUp = playerState.level > prevLevel;
 
@@ -871,12 +921,51 @@ function checkBadges() {
 function awardBadge(id) {
   if (playerState.badges.includes(id)) return;
   playerState.badges.push(id);
+  _pendingBadgeAnims.add(id);
   savePlayer();
   playSound('achievement');
+  showToast('🏅 BADGE: ' + (BADGE_DEFS[id] ? BADGE_DEFS[id].label : id));
+}
+
+function awardAchievement(id) {
+  if (!ACHIEVEMENT_DEFS[id]) return;
+  if (playerState.achievements.includes(id)) return;
+  playerState.achievements.push(id);
+  savePlayer();
+  playSound('achievement');
+  showToast(ACHIEVEMENT_DEFS[id].label + ' UNLOCKED!');
+}
+
+function showToast(text) {
   const toast = document.getElementById('badge-toast');
-  toast.textContent = '🏅 BADGE: ' + (BADGE_DEFS[id] ? BADGE_DEFS[id].label : id);
-  toast.classList.remove('hidden');
-  setTimeout(() => toast.classList.add('hidden'), 3000);
+  // Stack: if already visible, queue a brief delay
+  const delay = toast.classList.contains('hidden') ? 0 : 2200;
+  setTimeout(() => {
+    toast.textContent = text;
+    toast.classList.remove('hidden');
+    clearTimeout(toast._hideTimer);
+    toast._hideTimer = setTimeout(() => toast.classList.add('hidden'), 3000);
+  }, delay);
+}
+
+function checkAchievements() {
+  const p = playerState;
+  if (p.totalCorrect >= 1)   awardAchievement('FIRST_CORRECT');
+  if (gameState.streak >= 3) awardAchievement('STREAK_3');
+  if (gameState.streak >= 5) awardAchievement('STREAK_5');
+  if (gameState.streak >= 10) awardAchievement('STREAK_DIME');
+  if (p.level >= 5)  awardAchievement('LEVEL_5');
+  if (p.level >= 10) awardAchievement('LEVEL_10');
+  if (p.rating >= 61) awardAchievement('RANK_STARTER');
+  if (p.rating >= 67) awardAchievement('RANK_VETERAN');
+  if (p.rating >= 74) awardAchievement('RANK_ELITE');
+  if (p.rating >= 82) awardAchievement('RANK_ALLPRO');
+  if (p.rating >= 90) awardAchievement('RANK_HOF');
+  if (p.rating >= 97) awardAchievement('RANK_LEGEND');
+  if (p.totalAnswered >= 20 && p.totalCorrect / p.totalAnswered >= 0.9) awardAchievement('SHARP_SHOOTER');
+  if (gameState.mode === 'blitz' && gameState.sessionCorrect >= 25) awardAchievement('BLITZ_25');
+  if (p.totalAnswered >= 100) awardAchievement('ANSWERED_100');
+  if (p.dailyStreak >= 7) awardAchievement('DAILY_7');
 }
 
 // ═══ SECTION: RESULTS SCREEN ═══
@@ -947,11 +1036,21 @@ function loadNextQuestion() {
 const DOMAIN_FULL = { NET: 'Networking', IDN: 'Identity', CMP: 'Compute', DFC: 'Defender', STR: 'Storage' };
 
 function openProfile() {
-  const ri = getRankInfo(playerState.rating);
+  const ri  = getRankInfo(playerState.rating);
+  const nxt = getNextRank(playerState.rating);
+  const pct = getRankProgress(playerState.rating);
 
   document.getElementById('profile-rank-badge').textContent  = ri.rank.toUpperCase();
+  document.getElementById('profile-rank-badge').style.color  = ri.color;
   document.getElementById('profile-rating').textContent      = playerState.rating;
+  document.getElementById('profile-rating').style.color      = ri.color;
+  document.getElementById('profile-rating').style.textShadow = `0 0 10px ${ri.color}88, 0 0 20px ${ri.color}44`;
   document.getElementById('profile-level').textContent       = playerState.level;
+
+  const fill  = document.getElementById('profile-rank-fill');
+  const label = document.getElementById('profile-rank-next-label');
+  if (fill)  { fill.style.width = pct + '%'; fill.style.background = ri.color; }
+  if (label) { label.textContent = nxt ? pct + '% → ' + nxt.rank.toUpperCase() : 'MAX RANK'; }
   document.getElementById('profile-xp').textContent          = playerState.xp.toLocaleString();
   document.getElementById('profile-streak').textContent      = gameState.streak || 0;
   document.getElementById('profile-best-streak').textContent = playerState.bestStreak;
@@ -995,10 +1094,31 @@ function openProfile() {
   badgesEl.innerHTML = '';
   playerState.badges.forEach(id => {
     const chip = document.createElement('div');
-    chip.className = 'profile-badge-chip';
+    const isNew = _pendingBadgeAnims.has(id);
+    chip.className = 'profile-badge-chip' + (isNew ? ' badge-new' : '');
     chip.textContent = BADGE_DEFS[id] ? BADGE_DEFS[id].label : id;
     badgesEl.appendChild(chip);
+    if (isNew) _pendingBadgeAnims.delete(id);
   });
+
+  const achEl = document.getElementById('profile-achievements');
+  if (achEl) {
+    achEl.innerHTML = '';
+    Object.entries(ACHIEVEMENT_DEFS).forEach(([id, def]) => {
+      const unlocked = playerState.achievements.includes(id);
+      const chip = document.createElement('div');
+      chip.className = 'achievement-chip ' + (unlocked ? 'unlocked' : 'locked');
+      const [icon, ...rest] = def.label.split(' ');
+      chip.innerHTML =
+        `<span class="ach-icon">${icon}</span>` +
+        `<span class="ach-info">` +
+          `<div class="ach-label">${rest.join(' ')}</div>` +
+          `<div class="ach-desc">${def.desc}</div>` +
+        `</span>` +
+        (unlocked ? `<span class="ach-check">✓</span>` : '');
+      achEl.appendChild(chip);
+    });
+  }
 
   const toggleBtn = document.getElementById('sound-toggle');
   if (toggleBtn) {

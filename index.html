@@ -50,6 +50,8 @@
       <div class="card-rating-block">
         <div id="card-rating" class="card-rating">55</div>
         <div id="card-rank-label" class="card-rank-label">ROOKIE</div>
+        <div class="card-rank-progress"><div id="card-rank-bar" class="card-rank-bar"></div></div>
+        <div class="card-rank-next" id="card-rank-next"></div>
       </div>
       <div class="card-stats">
         <div class="stat-row">
@@ -265,6 +267,11 @@
       <button class="profile-close" id="profile-close">✕</button>
     </div>
 
+    <div class="profile-rank-progress-row">
+      <div class="profile-rank-track"><div class="profile-rank-fill" id="profile-rank-fill"></div></div>
+      <span class="profile-rank-next-label" id="profile-rank-next-label"></span>
+    </div>
+
     <div class="profile-stats-grid">
       <div class="profile-stat-item">
         <div class="psi-value" id="profile-xp">0</div>
@@ -297,6 +304,9 @@
 
     <div class="profile-section-label" id="profile-badges-label">BADGES</div>
     <div id="profile-badges" class="profile-badges"></div>
+
+    <div class="profile-section-label">ACHIEVEMENTS</div>
+    <div id="profile-achievements" class="profile-achievements"></div>
 
     <div class="profile-section-label">HIGH SCORES</div>
     <div class="profile-hs">

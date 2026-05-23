@@ -220,8 +220,41 @@ button { cursor: pointer; border: none; background: none; font-family: var(--fon
   box-shadow: var(--glow-blue);
   transition: border-color 0.4s, box-shadow 0.4s;
 }
-.player-card.rank-legend { border-color: var(--neon-orange); box-shadow: var(--glow-orange); }
-.player-card.rank-superstar { border-color: var(--neon-green); box-shadow: var(--glow-green); }
+.player-card.rank-rookie   { border-color: #333;                  box-shadow: none; }
+.player-card.rank-prospect { border-color: #445566;               box-shadow: none; }
+.player-card.rank-starter  { border-color: #667788;               box-shadow: 0 0 8px rgba(100,150,200,0.15); }
+.player-card.rank-veteran  { border-color: var(--neon-blue);      box-shadow: var(--glow-blue); }
+.player-card.rank-elite    { border-color: var(--neon-green);     box-shadow: var(--glow-green); }
+.player-card.rank-allpro   { border-color: var(--neon-orange);    box-shadow: var(--glow-orange); }
+.player-card.rank-hof      { border-color: var(--neon-purple);    box-shadow: 0 0 10px #bf00ff88, 0 0 20px #bf00ff44; }
+.player-card.rank-legend   { border-color: var(--neon-blue);      box-shadow: 0 0 20px #00d4ffaa, 0 0 40px #00d4ff44; animation: legendPulse 2.4s ease-in-out infinite; }
+
+@keyframes legendPulse {
+  0%, 100% { box-shadow: 0 0 20px #00d4ffaa, 0 0 40px #00d4ff44; }
+  50%       { box-shadow: 0 0 30px #00d4ffcc, 0 0 60px #00d4ff66; }
+}
+
+.card-rank-progress {
+  width: 100%;
+  height: 3px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+.card-rank-bar {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.5s ease, background 0.4s;
+}
+.card-rank-next {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: rgba(255,255,255,0.3);
+  text-align: center;
+  margin-top: 3px;
+  letter-spacing: 1px;
+}
 
 .card-top { display: flex; gap: 16px; align-items: flex-start; }
 
@@ -1311,6 +1344,31 @@ body.screen-shake  { animation: screenShake 0.4s ease; }
   gap: 10px;
 }
 
+.profile-rank-progress-row {
+  padding: 0 0 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.profile-rank-track {
+  height: 4px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.profile-rank-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.5s ease, background 0.4s;
+}
+.profile-rank-next-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: rgba(255,255,255,0.35);
+  text-align: right;
+  letter-spacing: 1px;
+}
+
 .profile-rating {
   font-family: var(--font-display);
   font-size: 64px;
@@ -1318,6 +1376,7 @@ body.screen-shake  { animation: screenShake 0.4s ease; }
   line-height: 1;
   color: var(--neon-blue);
   text-shadow: var(--glow-blue);
+  transition: color 0.4s, text-shadow 0.4s;
 }
 
 .profile-level-tag {
@@ -1443,6 +1502,78 @@ body.screen-shake  { animation: screenShake 0.4s ease; }
   color: var(--neon-orange);
   border-radius: 4px;
   padding: 4px 8px;
+}
+
+@keyframes badgePop {
+  0%   { transform: scale(0.4); opacity: 0; }
+  65%  { transform: scale(1.18); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.profile-badge-chip.badge-new {
+  animation: badgePop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  box-shadow: 0 0 12px var(--neon-orange);
+}
+
+/* ─── Achievement chips ─── */
+.profile-achievements {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-top: 4px;
+}
+
+.achievement-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-family: var(--font-body);
+}
+
+.achievement-chip.unlocked {
+  background: rgba(0,212,255,0.07);
+  border: 1px solid rgba(0,212,255,0.18);
+}
+
+.achievement-chip.locked {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.ach-icon {
+  font-size: 18px;
+  width: 22px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.achievement-chip.locked .ach-icon {
+  filter: grayscale(1);
+  opacity: 0.25;
+}
+
+.ach-info { flex: 1; min-width: 0; }
+
+.ach-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #ddd;
+  line-height: 1.2;
+}
+.achievement-chip.locked .ach-label { color: #444; }
+
+.ach-desc {
+  font-size: 10px;
+  color: rgba(255,255,255,0.3);
+  margin-top: 1px;
+}
+.achievement-chip.locked .ach-desc { color: #333; }
+
+.ach-check {
+  color: var(--neon-green);
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
 }
 
 .profile-hs {
